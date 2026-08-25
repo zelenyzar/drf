@@ -8,7 +8,7 @@ from materials.serializer import CourseSerializer, LessonSerializer, CourseDetai
 
 
 class CourseViewSet(ModelViewSet):
-    queryset = Course.objects.all()
+    queryset = Course.objects.all().prefetch_related('lessons')
 
     def get_serializer_class(self):
         if self.action == "retrieve":
