@@ -1,14 +1,5 @@
 from django.contrib import admin
-from django.contrib.admin import DateFieldListFilter
-from .models import Payment, User
-
-
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "email"
-    )
+from .models import Payment
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
@@ -23,7 +14,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
     list_filter = (
         "payment_method",
-        ("paid_at", DateFieldListFilter),
+        ("paid_at", admin.DateFieldListFilter),
     )
 
     search_fields = (
