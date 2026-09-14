@@ -4,33 +4,37 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
 
-from users.models import Payment
 from materials.models import Course, Lesson
+from users.models import Payment
 
 User = get_user_model()
 
+
 class Command(BaseCommand):
-    help = 'Create test payments'
+    help = "Create test payments"
 
     def handle(self, *args, **options):
         users = list(User.objects.all())
         if not users:
-            self.stdout.write('Нет пользователей. Создайте хотя бы одного.')
+            self.stdout.write("Нет пользователей. Создайте хотя бы одного.")
             return
 
         courses = list(Course.objects.all())
         lessons = list(Lesson.objects.all())
 
         if not courses and not lessons:
-            self.stdout.write('Нет курсов и уроков. Сначала создайте их.')
+            self.stdout.write("Нет курсов и уроков. Сначала создайте их.")
             return
 
-        methods = ['cash', 'transfer']
+        methods = ["cash", "transfer"]
 
         for i in range(5):
             user = random.choice(users)
             method = random.choice(methods)
-            amount = Decimal(random.randint(300, 5000)) + Decimal(random.randint(0, 99)) / 100
+            amount = (
+                Decimal(random.randint(300, 5000))
+                + Decimal(random.randint(0, 99)) / 100
+            )
 
             if courses and random.choice([True, False]):
                 paid_course = random.choice(courses)
@@ -53,8 +57,10 @@ class Command(BaseCommand):
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Создан платёж #{payment.id}"))
             else:
-                self.stdout.write(self.style.WARNING(
-                    f"Платёж уже существует (user={user.id}, course={paid_course.id if paid_course else None}, lesson={paid_lesson.id if paid_lesson else None})"
-                ))
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Платёж уже существует (user={user.id}, course={paid_course.id if paid_course else None}, lesson={paid_lesson.id if paid_lesson else None})"
+                    )
+                )
 
         self.stdout.write(self.style.SUCCESS("Готово."))

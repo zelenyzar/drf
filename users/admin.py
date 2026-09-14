@@ -1,10 +1,11 @@
 from django.contrib import admin
+
 from .models import Payment, User
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_filter = ('id', 'email')
+    list_filter = ("id", "email")
 
 
 @admin.register(Payment)
@@ -32,13 +33,22 @@ class PaymentAdmin(admin.ModelAdmin):
     ordering = ("-paid_at",)
 
     fieldsets = (
-        ("Основная информация", {
-            "fields": ("user", "amount", "payment_method"),
-        }),
-        ("Детали оплаты", {
-            "fields": ("paid_course", "paid_lesson"),
-        }),
-        ("Дата и время", {
-            "fields": ("paid_at",),
-        }),
+        (
+            "Основная информация",
+            {
+                "fields": ("user", "amount", "payment_method"),
+            },
+        ),
+        (
+            "Детали оплаты",
+            {
+                "fields": ("paid_course", "paid_lesson"),
+            },
+        ),
+        (
+            "Дата и время",
+            {
+                "fields": ("paid_at",),
+            },
+        ),
     )

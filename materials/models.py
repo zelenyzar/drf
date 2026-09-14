@@ -15,11 +15,11 @@ class Course(models.Model):
     )
     description = models.TextField(blank=True, null=True, verbose_name="Описание курса")
     owner = models.ForeignKey(
-        'users.User',
+        "users.User",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        verbose_name='Владелец',
+        verbose_name="Владелец",
     )
 
     class Meta:
@@ -50,10 +50,11 @@ class Lesson(models.Model):
     )
     video_url = models.URLField(max_length=1000, blank=True, null=True)
     owner = models.ForeignKey(
-        'users.User',
+        "users.User",
         on_delete=models.SET_NULL,
-        blank=True, null=True,
-        verbose_name='Владелец',
+        blank=True,
+        null=True,
+        verbose_name="Владелец",
     )
 
     class Meta:

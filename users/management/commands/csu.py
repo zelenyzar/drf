@@ -11,16 +11,21 @@ class Command(BaseCommand):
         user, created = User.objects.update_or_create(
             email=email,
             defaults={
-                'is_staff': True,
-                'is_active': True,
-                'is_superuser': True,
-            }
+                "is_staff": True,
+                "is_active": True,
+                "is_superuser": True,
+            },
         )
         user.set_password(password)
         user.save()
 
         if created:
-            self.stdout.write(self.style.SUCCESS(f'Пользователь {email} успешно создан!'))
+            self.stdout.write(
+                self.style.SUCCESS(f"Пользователь {email} успешно создан!")
+            )
         else:
             self.stdout.write(
-                self.style.WARNING(f'Пользователь {email} уже существовал, права обновлены, пароль изменен.'))
+                self.style.WARNING(
+                    f"Пользователь {email} уже существовал, права обновлены, пароль изменен."
+                )
+            )
