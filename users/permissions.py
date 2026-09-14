@@ -11,6 +11,6 @@ class IsOwner(permissions.BasePermission):
     """Проверяет, является ли пользователь владельцем."""
 
     def has_object_permission(self, request, view, obj):
-        if obj.owner == request.user:
-            return True
-        return False
+        if hasattr(obj, 'owner'):
+            return obj.owner == request.user
+        return obj == request.user
