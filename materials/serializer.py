@@ -1,3 +1,5 @@
+from django.template.context_processors import request
+from pyexpat.errors import messages
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
@@ -33,6 +35,17 @@ class CourseDetailSerializer(ModelSerializer):
 
     def get_lessons_count(self, obj):
         return obj.lessons.count()
+
+    def get_subscription(self, obj):
+        message = 'Подписка отсутствует'
+        request = self.context.get("request")
+        if request:
+            subscriptions = Subscription.objects.filter(user=request.user)
+            for subscription in subscriptions:
+                if subscription.course == obj:
+                    message = 'Вы подписаны на этот курс'
+        return message
+
 
 class SubscriptionSerializer(ModelSerializer):
     course = CourseSerializer(read_only=True)
