@@ -69,8 +69,8 @@ class Subscription(models.Model):
     )
     course = models.ForeignKey(
         Course,
-        on_delete=models.SET_NULL,
-        related_name="lessons",
+        on_delete=models.CASCADE,
+        related_name="subscriptions",
         verbose_name="Курс",
     )
 

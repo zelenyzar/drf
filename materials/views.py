@@ -91,4 +91,4 @@ class SubscriptionCreateApiView(CreateAPIView):
 class SubscriptionDestroyApiView(DestroyAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
-    permission_classes = (IsAuthenticated, IsOwner)
+    # permission_classes = (IsAuthenticated, IsOwner | IsModer)
