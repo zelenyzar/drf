@@ -8,6 +8,7 @@ from users.filters import PaymentFilter
 from users.models import Payment, User
 from users.permissions import IsOwner
 from users.serializers import PaymentSerializer, UserSerializer
+from users.services import create_price, create_session
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -64,4 +65,9 @@ class PaymentViewSet(viewsets.ModelViewSet):
         return Payment.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        payment = serializer.save(user=self.request.user)
+        price = create_price(payment.paid_course.pk, payment.amount)
+        session_id, link = create_session(price)
+        payment.session_id = session_id
+        payment.link = link
+        payment.save()

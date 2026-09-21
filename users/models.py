@@ -116,6 +116,13 @@ class Payment(models.Model):
         auto_now_add=True,
         verbose_name="Дата оплаты",
     )
+    session_id = models.CharField(max_length=200, null=True, blank=True, help_text='укажите ID сессии')
+    link = models.URLField(
+        max_length=800,
+        null=True,
+        blank=True,
+        help_text='ссылка на платеж'
+    )
 
     class Meta:
         verbose_name = "Платёж"
