@@ -11,6 +11,8 @@ from materials.models import Course, Lesson, Subscription
 from materials.pagination import MyPagination
 from materials.serializer import (CourseDetailSerializer, CourseSerializer,
                                   LessonSerializer, SubscriptionSerializer)
+from materials.task import mailing
+
 from users.permissions import IsModer, IsOwner
 
 
@@ -25,6 +27,15 @@ class CourseViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save()
+        course_id = serializer.data.get("id")
+        subscribers = Subscription.objects.filter(course_id=course_id)
+        email = []
+        for subscriber in subscribers:
+            email.append(subscriber.user.email)
+        mailing.delay(email, course_id)
 
     def get_permissions(self):
         if self.action == "create":
@@ -74,19 +85,25 @@ class LessonDestroyApiView(DestroyAPIView):
     serializer_class = LessonSerializer
     permission_classes = (IsAuthenticated, IsOwner | ~IsModer)
 
+
 class SubscriptionCreateApiView(CreateAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
-    permission_classes = (~IsModer, IsAuthenticated)
+    # permission_classes = (~IsModer, IsAuthenticated)
 
     def post(self, request, course_id):
         course = get_object_or_404(Course, pk=course_id)
         user = request.user
-        subscription, created = Subscription.objects.get_or_create(user=user, course=course)
+        subscription, created = Subscription.objects.get_or_create(
+            user=user, course=course
+        )
         serializer = self.get_serializer(subscription)
         if not created:
-            return Response({'detail': 'Подписка уже создана'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Подписка уже создана"}, status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class SubscriptionDestroyApiView(DestroyAPIView):
     queryset = Subscription.objects.all()

@@ -61,6 +61,7 @@ class Lesson(models.Model):
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
 
+
 class Subscription(models.Model):
     user = models.ForeignKey(
         "users.User",
@@ -79,4 +80,4 @@ class Subscription(models.Model):
         verbose_name_plural = "Подписки"
 
     def __str__(self):
-        return f'{self.user.email} подписан на {self.course}'
+        return f"{self.user.email} подписан на {self.course}"
