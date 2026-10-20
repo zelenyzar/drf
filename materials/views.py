@@ -1,4 +1,5 @@
 from django.core.serializers import serialize
+from django.db import transaction
 from rest_framework import status
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
@@ -12,7 +13,6 @@ from materials.pagination import MyPagination
 from materials.serializer import (CourseDetailSerializer, CourseSerializer,
                                   LessonSerializer, SubscriptionSerializer)
 from materials.task import mailing
-
 from users.permissions import IsModer, IsOwner
 
 
@@ -25,17 +25,39 @@ class CourseViewSet(ModelViewSet):
             return CourseDetailSerializer
         return CourseSerializer
 
+    @transaction.atomic
+    def perform_update(self, serializer):
+        course = serializer.save()
+
+        subscribers = (
+            Subscription.objects
+            .filter(course=course)
+            .select_related("user")
+        )
+
+        emails = [
+            sub.user.email
+            for sub in subscribers
+            if sub.user.email
+        ]
+
+        for email in emails:
+            mailing.delay(email=email, course_id=course.id)
+
+        return course
+
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    def perform_update(self, serializer):
-        serializer.save()
-        course_id = serializer.data.get("id")
-        subscribers = Subscription.objects.filter(course_id=course_id)
-        email = []
-        for subscriber in subscribers:
-            email.append(subscriber.user.email)
-        mailing.delay(email, course_id)
+    # def perform_update(self, serializer):
+    #     serializer.save()
+    #     course_id = serializer.data.get("id")
+    #     subscribers = Subscription.objects.filter(course_id=course_id)
+    #     email = []
+    #     for subscriber in subscribers:
+    #         email.append(subscriber.user.email)
+    #     mailing.delay(email, course_id)
 
     def get_permissions(self):
         if self.action == "create":
