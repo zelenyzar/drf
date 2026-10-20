@@ -50,15 +50,6 @@ class CourseViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    # def perform_update(self, serializer):
-    #     serializer.save()
-    #     course_id = serializer.data.get("id")
-    #     subscribers = Subscription.objects.filter(course_id=course_id)
-    #     email = []
-    #     for subscriber in subscribers:
-    #         email.append(subscriber.user.email)
-    #     mailing.delay(email, course_id)
-
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = (~IsModer,)
